@@ -1,14 +1,14 @@
-# Open Lovart — Open-Source Alternative to Lovart, Runway Agent, Luma Labs Agent, Higgsfield Agent, Krea Agent
+# Open Lovart — Open-Source Alternative to Lovart, Runway Agent, Luma Labs Agent, Krea Agent
 
 > **The free, open-source AI design agent.** Plan, generate, and assemble full creative deliverables — posters, social campaigns, brand kits, ad creatives, motion ads, and video cutdowns — through an autonomous agent that orchestrates 200+ image and video models. No subscription, no credit caps, no creative restrictions.
 
 **Community:** Join [Reddit](https://reddit.com/r/muapi) & [Discord](https://discord.gg/s7KW4fsqXK) for discussions and support
 
-> 🤖 **Automate Lovart, Runway, Luma Labs, Higgsfield, Krea, Pika & more with AI coding agents:** [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) — a library of skills that let agents like **Claude Code**, **Codex**, and other coding assistants drive 200+ image/video models end-to-end (brief → plan → generate → edit → assemble) directly from your terminal. Build automated creative pipelines without touching a UI.
+> 🤖 **Automate Lovart, Runway, Luma Labs, Krea, Pika & more with AI coding agents:** [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) — a library of skills that let agents like **Claude Code**, **Codex**, and other coding assistants drive 200+ image/video models end-to-end (brief → plan → generate → edit → assemble) directly from your terminal. Build automated creative pipelines without touching a UI.
 
 ### Related projects
 
-> **Open-source Higgsfield, Freepik, Krea, Openart alternative — uncensored image & video studio with 200+ models** -> https://github.com/Anil-matcha/Open-Generative-AI
+> **Open-source Freepik, Krea, Openart alternative — uncensored image & video studio with 200+ models** -> https://github.com/Anil-matcha/Open-Generative-AI
 
 > **Open-source Weavy, Flora Fauna, Freepik Spaces, Krea Nodes alternative — visual workflow editor** -> https://github.com/SamurAIGPT/Vibe-Workflow
 
@@ -28,7 +28,7 @@ Run the design agent directly in your browser — no Node.js, no setup. Sign up 
 
 Open Lovart is a free, open-source AI design agent that turns natural-language briefs into full creative deliverables. Instead of picking one model and generating one asset, you describe a campaign, brand, or scene and the agent plans the deliverable list, picks the best model per asset (typography, vector, photoreal, motion), generates them in dependency order, threads brand references forward, and hands back the assembled kit. Powered by [Muapi.ai](https://muapi.ai), it orchestrates 200+ image and video models — Nano Banana 2, Flux 2 Pro, Ideogram v3, Seedream 5, GPT-Image, Recraft v3, Midjourney v7, Kling, Sora, Veo, Runway, Luma Ray2 — across a single agent loop you can self-host and modify.
 
-**Why Open Lovart instead of Lovart, Runway Agent, Luma Labs Agent, Higgsfield Agent, Krea Agent?**
+**Why Open Lovart instead of Lovart, Runway Agent, Luma Labs Agent, Krea Agent?**
 - **Free & open-source** — MIT-licensed, no subscription, no credit caps
 - **Self-hosted** — your briefs, brand kits, and outputs stay on your machine
 - **200+ models orchestrated** — image *and* video, routed automatically per asset (Flux 2, Nano Banana 2, Ideogram v3, Recraft v3, Kling, Sora, Veo, Runway, Luma Ray2)
@@ -161,11 +161,11 @@ npm run start
 - **Muapi.ai** — AI model API gateway
 - **Vibe Workflow** — Open-source node-based workflow engine
 
-## 🤔 How is this different from Lovart, Runway Agent, Luma Labs Agent, Higgsfield Agent, Krea Agent?
+## 🤔 How is this different from Lovart, Runway Agent, Luma Labs Agent, Krea Agent?
 
 **Open Lovart** is a community-driven, open-source alternative to closed AI design agents — same agentic creative loop, none of the lock-in.
 
-| | Lovart / Runway / Luma / Higgsfield / Krea Agents | Open Lovart |
+| | Lovart / Runway / Luma / Krea Agents | Open Lovart |
 | :--- | :--- | :--- |
 | **Cost** | Subscription + credit packs | Free (open-source) |
 | **Credit caps** | Hard monthly limits | Pay-as-you-go via your own Muapi key |
@@ -189,6 +189,6 @@ MIT
 Built with [Muapi.ai](https://muapi.ai) — the unified API for AI image and video generation models.
 
 ---
-*Looking for a free, open-source Lovart alternative? Open Lovart is an open-source AI design agent — a Lovart, Runway Agent, Luma Labs Agent, Higgsfield Agent, Krea Agent, Pika Agent, Galileo AI, Magic Patterns replacement that you can self-host, customize, and extend.*
+*Looking for a free, open-source Lovart alternative? Open Lovart is an open-source AI design agent — a Lovart, Runway Agent, Luma Labs Agent, Krea Agent, Pika Agent, Galileo AI, Magic Patterns replacement that you can self-host, customize, and extend.*
 
-This project is an independent, experimental, and open-source initiative and is not affiliated with, endorsed by, or associated with Lovart, Runway, Luma Labs, Higgsfield, Krea AI, Pika Labs, Galileo AI, Magic Patterns, or any of their respective companies, products, or services. Any references to third-party platforms, models, or technologies are made solely for interoperability, benchmarking, research, or educational purposes. All trademarks, logos, and brand names are the property of their respective owners. If any content in this repository creates confusion or raises concerns, please contact us and we will promptly review and address it.
+This project is an independent, experimental, and open-source initiative and is not affiliated with, endorsed by, or associated with Lovart, Runway, Luma Labs, Krea AI, Pika Labs, Galileo AI, Magic Patterns, or any of their respective companies, products, or services. Any references to third-party platforms, models, or technologies are made solely for interoperability, benchmarking, research, or educational purposes. All trademarks, logos, and brand names are the property of their respective owners. If any content in this repository creates confusion or raises concerns, please contact us and we will promptly review and address it.
