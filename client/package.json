@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev",
+    "dev:turbo": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -23,7 +24,8 @@
     "react-konva": "^19.2.3",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "design-agent": "*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

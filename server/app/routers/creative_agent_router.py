@@ -109,6 +109,17 @@ async def get_session_jobs(session_id: str):
     url = f"{API_SUFFIX}/api/v1/creative-agent/sessions/{session_id}/jobs"
     return await proxy_request_helper("GET", url)
 
+@router.get("/agent-skills")
+async def get_agent_skills():
+    url = f"{API_SUFFIX}/api/v1/creative-agent/agent-skills"
+    return await proxy_request_helper("GET", url)
+
+@router.post("/sessions/{session_id}/run-skill")
+async def run_skill(session_id: str, request: Request):
+    payload = await request.json()
+    url = f"{API_SUFFIX}/api/v1/creative-agent/sessions/{session_id}/run-skill"
+    return await proxy_request_helper("POST", url, payload)
+
 # Account balance endpoint
 @router.get("/account/balance")
 async def get_account_balance():
