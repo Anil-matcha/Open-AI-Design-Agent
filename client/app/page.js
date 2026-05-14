@@ -88,6 +88,7 @@ export default function AssistantDashboard() {
   useEffect(() => {
     setMounted(true);
     fetchSessions();
+    fetchSkills();
   }, []);
 
   const fetchSessions = async () => {
@@ -110,6 +111,15 @@ export default function AssistantDashboard() {
     }
   };
 
+  const fetchSkills = async () => {
+    try {
+      const { data } = await axios.get(`${API}/agent-skills`);
+      setSkills(data);
+    } catch (err) {
+      console.error("Failed to fetch skills:", err);
+    }
+  };
+
 
   const deleteSession = async (sessionId, sessionName) => {
     if (!window.confirm(`Delete chat "${sessionName || "Untitled"}"? This cannot be undone.`)) return;
@@ -124,6 +134,22 @@ export default function AssistantDashboard() {
 
   const removeAttachment = (url) => {
     setAttachments(prev => prev.filter(a => a.url !== url));
+  };
+
+  const selectMention = (item, type) => {
+    const before = input.substring(0, mentionCursorPos);
+    const after = input.substring(textareaRef.current.selectionStart);
+    
+    if (type === "skill") {
+      setActiveSkill(item);
+      setInput(before + after); 
+    } else {
+      const insertion = `@${item.asset_label || "asset"}`;
+      setInput(before + insertion + after);
+    }
+    
+    setShowMentionPopup(false);
+    setTimeout(() => textareaRef.current?.focus(), 10);
   };
 
   const processFile = async (file) => {
@@ -207,6 +233,7 @@ export default function AssistantDashboard() {
         };
 
         if (skill) {
+          url += `&skill=${encodeURIComponent(skill.name)}`;
           const primaryInputKey = skill.inputs?.[0] || "premise";
           await axios.post(`${API}/sessions/${sessionId}/run-skill`, {
             skill_name: skill.name,
@@ -215,6 +242,7 @@ export default function AssistantDashboard() {
             model: "gpt-4o"
           });
         } else {
+          url += `&q=${encodeURIComponent(initialMsg)}`;
           await axios.post(`${API}/sessions/${sessionId}/chat`, {
             message: initialMsg,
             messages_snapshot: [userMsg],
@@ -223,7 +251,7 @@ export default function AssistantDashboard() {
         }
       }
       
-      router.push(`/canvas?session=${sessionId}`);
+      router.push(url);
     } catch (err) {
       toast.error("Failed to start session");
     }
@@ -237,6 +265,9 @@ export default function AssistantDashboard() {
       }
     }
   };
+
+  const filteredSkills = skills.filter(s => s.name.toLowerCase().includes(mentionQuery.toLowerCase()));
+  const filteredAssets = attachments.map((a, i) => ({ ...a, asset_label: `asset_${i+1}` })).filter(a => a.asset_label.includes(mentionQuery.toLowerCase()));
 
 
   if (!mounted) return null;
@@ -264,13 +295,31 @@ export default function AssistantDashboard() {
                 ref={textareaRef}
                 value={input}
                 autoFocus
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const pos = e.target.selectionStart;
+                  setInput(val);
+                  
+                  const lastAtPos = val.lastIndexOf("@", pos - 1);
+                  if (lastAtPos !== -1 && (lastAtPos === 0 || val[lastAtPos - 1] === " ")) {
+                    const query = val.substring(lastAtPos + 1, pos);
+                    if (!query.includes(" ")) {
+                      setMentionQuery(query);
+                      setMentionCursorPos(lastAtPos);
+                      setShowMentionPopup(true);
+                    } else {
+                      setShowMentionPopup(false);
+                    }
+                  } else {
+                    setShowMentionPopup(false);
+                  }
+                }}
                 onKeyDown={handleKey}
                 placeholder={placeholderText}
                 className="w-full bg-transparent border-none focus:ring-0 text-lg p-4 h-24 resize-none placeholder:text-secondary-text/50 outline-none scrollbar-subtle"
               />
               <div className="flex items-center justify-between px-2 pb-2">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 relative">
                   <input 
                     type="file" 
                     ref={fileInputRef} 
@@ -291,33 +340,184 @@ export default function AssistantDashboard() {
                       <FiPlus size={20} />
                     )}
                   </button>
+                  <button 
+                    onClick={() => setShowSkillsMenu(!showSkillsMenu)}
+                    className={`p-2 hover:bg-bg-page rounded-full transition-colors ${activeSkill || showSkillsMenu ? "text-primary bg-primary/10" : "text-secondary-text"}`}
+                    title="Skills"
+                  >
+                    <GoBook size={20} />
+                  </button>
 
-                  {/* Attachment Preview Bar */}
-                  {attachments.length > 0 && (
-                    <div className="flex flex-wrap gap-2 px-2">
+                  {/* Mention & Attachment Preview Bar */}
+                  {(uploading || attachments.length > 0 || input.includes("@")) && (
+                    <div className="absolute bottom-full left-0 mb-1 flex flex-wrap gap-2 bg-bg-card border border-divider rounded shadow-xl z-10 animate-in slide-in-from-bottom-2 duration-300">
                       {attachments.map((att, i) => (
                         <div 
                           key={i} 
-                          className="relative group flex items-center gap-2 px-2 py-1 bg-bg-page border border-divider rounded-lg cursor-help hover:border-primary/50 transition-all"
+                          className="relative group flex items-center gap-2 px-2 py-1 bg-bg-page border border-divider rounded cursor-help hover:border-primary/50 transition-all"
                           onMouseEnter={() => setHoveredAsset(att)}
                           onMouseLeave={() => setHoveredAsset(null)}
                         >
                           <div className="w-5 h-5 rounded overflow-hidden">
                             {att.kind === "image" ? <img src={att.url} className="w-full h-full object-cover" /> : <FiTerminal size={10} />}
                           </div>
-                          <span className="text-[10px] font-bold text-secondary-text">asset_{i+1}</span>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); removeAttachment(att.url); }}
-                            className="ml-1 text-secondary-text hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <FiX size={12} />
-                          </button>
+                          <span className="text-[10px] font-bold text-secondary-text">{`asset_${i+1}`}</span>
                         </div>
                       ))}
+                      
+                      {/* Detection for @asset_N in text */}
+                      {input.match(/@asset_\d+/g)?.map(match => {
+                        const index = parseInt(match.split('_')[1]) - 1;
+                        const asset = attachments[index];
+                        if (!asset) return null;
+                        return (
+                          <div 
+                            key={match}
+                            className="relative group flex items-center gap-2 px-2 py-1 bg-primary/5 border border-primary/20 rounded-lg cursor-help hover:border-primary/50 transition-all"
+                            onMouseEnter={() => setHoveredAsset(asset)}
+                            onMouseLeave={() => setHoveredAsset(null)}
+                          >
+                            <div className="w-5 h-5 rounded overflow-hidden bg-primary/10 flex items-center justify-center text-primary">
+                              {asset.kind === "image" ? <img src={asset.url} className="w-full h-full object-cover" /> : <RiSparklingLine size={10} />}
+                            </div>
+                            <span className="text-[10px] font-bold text-primary">{match}</span>
+                          </div>
+                        );
+                      })}
+
+                      {uploading && (
+                        <div className="flex items-center gap-2 px-2 py-1 bg-bg-page border border-divider border-dashed rounded-lg">
+                          <div className="w-3 h-3 border-2 border-t-transparent border-primary rounded-full animate-spin" />
+                          <span className="text-[10px] font-bold text-secondary-text">{uploadProgress}%</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {hoveredAsset && (
+                    <div className="absolute bottom-full left-0 mb-10 w-72 aspect-square bg-bg-card border border-divider rounded-md shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden z-[110] animate-in fade-in zoom-in-95 duration-200 pointer-events-none">
+                      {hoveredAsset.kind === "image" ? (
+                        <img src={hoveredAsset.url} className="w-full h-full object-cover" />
+                      ) : hoveredAsset.kind === "video" ? (
+                        <video src={hoveredAsset.url} className="w-full h-full object-cover" autoPlay muted loop />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-bg-page gap-3 p-6 text-center">
+                          <FiTerminal size={48} className="text-primary opacity-20" />
+                          <div className="text-xs font-medium text-secondary-text truncate w-full">{hoveredAsset.url.split('/').pop()}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {showMentionPopup && (
+                    <div className="absolute bottom-full left-0 mb-2 flex items-end gap-3 z-50">
+                      <div className="w-64 bg-bg-card border border-divider rounded shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        <div className="p-2 border-b border-divider/30 text-[10px] font-bold text-secondary-text uppercase tracking-widest bg-bg-page/50">
+                          Mentions
+                        </div>
+                        <div className="max-h-60 overflow-y-auto scrollbar-subtle py-1">
+                          {filteredSkills.length > 0 && (
+                            <div className="px-3 py-1.5 text-[9px] font-bold text-primary uppercase opacity-60">Skills</div>
+                          )}
+                          {filteredSkills.map(skill => (
+                            <button
+                              key={skill.name}
+                              onClick={() => selectMention(skill, "skill")}
+                              className="w-full text-left px-3 py-2 hover:bg-bg-page transition-colors flex items-center gap-2 group"
+                            >
+                              <RiSparklingLine size={12} className="text-primary opacity-50 group-hover:opacity-100" />
+                              <span className="text-xs font-medium text-primary-text">{skill.name}</span>
+                            </button>
+                          ))}
+                          {filteredSkills.length === 0 && (
+                            <div className="px-4 py-8 text-center text-secondary-text text-xs italic opacity-50">No matches found</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="relative">
+                    {showSkillsMenu && (
+                      <div className="fixed inset-0 z-50 bg-bg-page/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+                        <div className="fixed inset-0" onClick={() => setShowSkillsMenu(false)} />
+                        <div className="relative w-full max-w-2xl bg-bg-card border border-divider rounded-md shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-200">
+                          <div className="px-4 py-3 border-b border-divider flex items-center justify-between bg-bg-page/30">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded bg-primary/10 flex items-center justify-center text-primary shadow-inner border border-primary/20">
+                                <GoBook size={24} />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-primary-text tracking-tight">Agent Skills</h3>
+                                <p className="text-xs text-secondary-text font-medium opacity-70">Power up your creative workflow with specialized AI experts.</p>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => setShowSkillsMenu(false)}
+                              className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-bg-page border border-divider rounded text-xs font-bold text-secondary-text hover:text-primary hover:border-primary/30 transition-all"
+                            >
+                              <CgTerminal size={14} />
+                              Dismiss
+                            </button>
+                          </div>
+                          <div className="p-2 max-h-[60vh] overflow-y-auto scrollbar-subtle grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {skills.map(s => (
+                              <button
+                                key={s.name}
+                                onClick={() => { setActiveSkill(s); setShowSkillsMenu(false); }}
+                                className={`group relative flex flex-col gap-2 p-4 rounded transition-all text-left border ${activeSkill?.name === s.name ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20" : "bg-bg-page/50 border-divider/50 hover:border-primary/30 hover:bg-bg-page hover:shadow-md"}`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded flex items-center justify-center transition-all ${activeSkill?.name === s.name ? "bg-primary text-white scale-110 shadow-lg shadow-primary/20" : "bg-bg-card text-primary border border-divider group-hover:scale-110"}`}>
+                                      <RiSparklingLine size={16} />
+                                    </div>
+                                    <div className="font-bold text-sm tracking-tight capitalize group-hover:text-primary transition-colors">{s.name.replace(/-/g, ' ')}</div>
+                                  </div>
+                                  {activeSkill?.name === s.name && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+                                </div>
+                                <div className="text-[11px] text-secondary-text line-clamp-2 leading-relaxed opacity-80 h-8">{s.description || "Expert agent workflow for high-quality generation."}</div>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="px-4 py-2 bg-bg-page/50 border-t border-divider flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-secondary-text uppercase tracking-widest opacity-60">
+                              <RiRobot2Line size={14} />
+                              Design Protocol v1.2
+                            </div>
+                            <button 
+                              onClick={() => setShowSkillsMenu(false)}
+                              className="px-4 py-2 text-xs font-bold text-primary-text hover:bg-bg-page rounded transition-colors border border-transparent hover:border-divider"
+                            >
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {activeSkill && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-bold animate-in zoom-in-95">
+                      <RiSparklingLine size={12} />
+                      {activeSkill.name}
+                      <button onClick={() => setActiveSkill(null)} className="hover:text-primary-text ml-1">&#x2715;</button>
                     </div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
+                  {attachments.length > 0 && (
+                    <div className="flex items-center -space-x-2 mr-2">
+                      {attachments.map((a, i) => (
+                        <div key={i} className="w-6 h-6 rounded-full border-2 border-bg-card bg-bg-page overflow-hidden shadow-sm">
+                          {a.kind === "image" ? <img src={a.url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-black"><FiTerminal size={10} className="text-white" /></div>}
+                        </div>
+                      ))}
+                      <button onClick={() => setAttachments([])} className="w-6 h-6 rounded-full border-2 border-bg-card bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10">
+                        <FiPlus size={12} className="rotate-45" />
+                      </button>
+                    </div>
+                  )}
                   <button 
                     onClick={() => (input.trim() || attachments.length > 0) && startNewSession(input.trim(), activeSkill, attachments)}
                     disabled={!input.trim() && attachments.length === 0}
@@ -327,21 +527,6 @@ export default function AssistantDashboard() {
                   </button>
                 </div>
               </div>
-              
-              {hoveredAsset && (
-                <div className="absolute bottom-full left-4 mb-4 w-72 aspect-square bg-bg-card border border-divider rounded-md shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden z-[110] animate-in fade-in zoom-in-95 duration-200 pointer-events-none">
-                  {hoveredAsset.kind === "image" ? (
-                    <img src={hoveredAsset.url} className="w-full h-full object-cover" />
-                  ) : hoveredAsset.kind === "video" ? (
-                    <video src={hoveredAsset.url} className="w-full h-full object-cover" autoPlay muted loop />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-bg-page gap-3 p-6 text-center">
-                      <FiTerminal size={48} className="text-primary opacity-20" />
-                      <div className="text-xs font-medium text-secondary-text truncate w-full">{hoveredAsset.url.split('/').pop()}</div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
           <div className="w-full">
