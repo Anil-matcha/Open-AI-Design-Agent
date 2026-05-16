@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Colors */
+  --da-brand-primary: #3b82f6;
+  --da-brand-primary-hover: #2563EB;
+  --da-brand-accent: #818CF8;
+  --da-brand-accent-hover: #7C3AED;
+
+  /* Semantic Theme Tokens */
+  --da-primary: #3b82f6;
+  --da-secondary: #818CF8;
+  --da-bg-page: #F8FAFC;
+  --da-bg-card: #FFFFFF;
+  --da-bg-card-hover: #F1F5F9;
+  --da-bg-elevated: #FFFFFF;
+  --da-text-primary: #0F172A;
+  --da-text-secondary: #475569;
+  --da-text-muted: #94A3B8;
+  --da-border-subtle: #E2E8F0;
+  --da-border-default: #CBD5E1;
+  --da-border-hover: #94A3B8;
+
+  /* Status Colors */
+  --da-color-success: #10B981;
+  --da-color-success-bg: #ECFDF5;
+  --da-color-warning: #F59E0B;
+  --da-color-warning-bg: #FFFBEB;
+  --da-color-error: #EF4444;
+  --da-color-error-bg: #FEF2F2;
+  --da-color-info: #3B82F6;
+  --da-color-info-bg: #EFF6FF;
+
+  /* Shadows */
+  --da-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --da-shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --da-shadow-card-hover: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --da-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+  /* Radius */
+  --da-radius-sm: 6px;
+  --da-radius: 4px;
+  --da-radius-md: 10px;
+  --da-radius-lg: 14px;
+  --da-radius-xl: 18px;
+}
+
+.dark {
+  --da-primary: #3b82f6;
+  --da-secondary: #A78BFA;
+  --da-bg-page: #121212;
+  --da-bg-card: #1E1E1E;
+  --da-bg-card-hover: #2A2A2A;
+  --da-bg-elevated: #1E1E1E;
+  --da-text-primary: #E0E0E0;
+  --da-text-secondary: #B0B0B0;
+  --da-text-muted: #71717a;
+  --da-border-subtle: #333333;
+  --da-border-default: #444444;
+  --da-border-hover: #555555;
+
+  /* Status Colors (Dark) */
+  --da-color-success-bg: rgba(16, 185, 129, 0.1);
+  --da-color-warning-bg: rgba(245, 158, 11, 0.1);
+  --da-color-error-bg: rgba(239, 68, 68, 0.1);
+  --da-color-info-bg: rgba(59, 130, 246, 0.1);
+  
+  --da-shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --da-shadow-card-hover: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 10px;
+}
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ===== TYPING INDICATOR ===== */
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 4px;
+  height: 4px;
+  background-color: currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% { 
+    transform: scale(0);
+    opacity: 0.6;
+  } 
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
