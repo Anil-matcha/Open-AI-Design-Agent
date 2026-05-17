@@ -18,7 +18,7 @@
 
 ## 🌐 Try it Online — No Install Required
 
-**Hosted version:** [https://dev.muapi.ai/open-lovart](https://dev.muapi.ai/assistant)
+**Hosted version:** [https://muapi.ai/assistant](https://muapi.ai/assistant)
 
 Run the design agent directly in your browser — no Node.js, no setup. Sign up for a free account to start designing. The hosted version is always up to date with the latest models, planners, and templates.
 
@@ -26,7 +26,7 @@ Run the design agent directly in your browser — no Node.js, no setup. Sign up 
 
 ---
 
-Open Lovart is a free, open-source AI design agent that turns natural-language briefs into full creative deliverables. Instead of picking one model and generating one asset, you describe a campaign, brand, or scene and the agent plans the deliverable list, picks the best model per asset (typography, vector, photoreal, motion), generates them in dependency order, threads brand references forward, and hands back the assembled kit. Powered by [Muapi.ai](https://muapi.ai), it orchestrates 200+ image and video models — Nano Banana 2, Flux 2 Pro, Ideogram v3, Seedream 5, GPT-Image, Recraft v3, Midjourney v7, Kling, Sora, Veo, Runway, Luma Ray2 — across a single agent loop you can self-host and modify.
+Open AI Design Agent is a free, open-source AI design agent that turns natural-language briefs into full creative deliverables. Instead of picking one model and generating one asset, you describe a campaign, brand, or scene and the agent plans the deliverable list, picks the best model per asset (typography, vector, photoreal, motion), generates them in dependency order, threads brand references forward, and hands back the assembled kit. Powered by [Muapi.ai](https://muapi.ai), it orchestrates 200+ image and video models — Nano Banana 2, Flux 2 Pro, Ideogram v3, Seedream 5, GPT-Image, Recraft v3, Midjourney v7, Kling, Sora, Veo, Runway, Luma Ray2 — across a single agent loop you can self-host and modify.
 
 **Why Open Lovart instead of Lovart, Runway Agent, Luma Labs Agent, Krea Agent?**
 - **Free & open-source** — MIT-licensed, no subscription, no credit caps
