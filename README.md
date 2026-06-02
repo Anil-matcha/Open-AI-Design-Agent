@@ -4,6 +4,11 @@ Open-source, self-hosted alternative to [Poe AI](https://poe.com) — chat with 
 
 Poe (by Quora) is a hosted aggregator that puts GPT, Claude, Gemini, Grok, DeepSeek, Llama, Mistral and image/video models behind one chat UI. **Open-Poe-AI** is the self-hosted version: bring your own API keys, run it on your own server, and keep full control of prompts, conversations, and data.
 
+## Related Projects
+
+- [Open-Pomelli](https://github.com/SamurAIGPT/Open-Pomelli) — Open-source Pomelli alternative — another self-hosted AI assistant
+- [open-character-ai](https://github.com/Anil-matcha/open-character-ai) — Open-source Character.AI alternative with custom AI personas
+
 ## Features
 
 - **Multi-model chat** — unified interface for OpenAI, Anthropic, Google, Mistral, DeepSeek, xAI, Meta Llama, and any OpenAI-compatible endpoint (including local models via Ollama / vLLM / LM Studio).
