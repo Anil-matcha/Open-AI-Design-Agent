@@ -1,1 +1,14 @@
-node_modules
+.env
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+dist/
+*.egg-info/
+data/
+*.db
+*.sqlite
+.DS_Store
