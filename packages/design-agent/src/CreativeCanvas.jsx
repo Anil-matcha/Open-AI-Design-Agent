@@ -34,6 +34,14 @@ import Image from "next/image";
 
 
 const API = "/api/v1/creative-agent";
+const GENERATION_TOOL_NAMES = new Set([
+  "generate_image",
+  "generate_video",
+  "image_to_video",
+  "edit_image",
+  "edit_video",
+  "enhance_image",
+]);
 
 const formatTime = (dateStr) => {
   if (!dateStr) return "";
@@ -80,11 +88,17 @@ export default function CreativeCanvas({
   // userBalanceLabel: string like "$ 5.00" or "1200 credits" to show in the dropdown.
   // If not provided, falls back to "$ {user.balance}".
   userBalanceLabel = null,
+  onGenerationStart,
+  onGenerationEnd,
+  onGenerationComplete,
+  onGenerationError,
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const inEmbedMode = isEmbed && !!embedCode;
   const embedStorageKey = inEmbedMode ? `muapi_agent_session_${embedCode}` : null;
+  const notifiedGenerationEventsRef = useRef(new Set());
+  const generationActivityEventIdsRef = useRef(new Set());
   const [embedSessionId, setEmbedSessionId] = useState(() => {
     if (typeof window === "undefined" || !embedStorageKey) return null;
     return window.localStorage.getItem(embedStorageKey) || null;
@@ -310,7 +324,7 @@ export default function CreativeCanvas({
       switch (ev.type) {
         case "text":         return { type: "text", content: p.content };
         case "info":         return { type: "info", content: p.content };
-        case "error":        return { type: "error", message: p.message };
+        case "error":        return { type: "error", name: p.name, message: p.message };
         case "tool_call":    return { type: "tool_call", name: p.name, args: p.args };
         case "tool_result":  return { type: "tool_result", name: p.name, result: p.result, asset: p.asset };
         case "plan_propose": return { type: "plan_propose", title: p.title, nodes: p.nodes, total_credits: p.total_credits };
@@ -368,7 +382,62 @@ export default function CreativeCanvas({
       return arr;
     });
 
-    if (flat.type === "tool_call" && ["generate_image", "generate_video", "image_to_video", "edit_image", "edit_video", "enhance_image"].includes(flat.name)) {
+    const notificationKey = ev.id || [
+      flat.job_id,
+      flat.type,
+      flat.name,
+      flat.asset?.url,
+      flat.message,
+    ].filter(Boolean).join(":");
+
+    if (
+      ev.id &&
+      !generationActivityEventIdsRef.current.has(ev.id)
+    ) {
+      if (
+        flat.type === "tool_call" &&
+        GENERATION_TOOL_NAMES.has(flat.name)
+      ) {
+        generationActivityEventIdsRef.current.add(ev.id);
+        onGenerationStart?.();
+      } else if (
+        flat.type === "error" ||
+        (
+          flat.type === "tool_result" &&
+          GENERATION_TOOL_NAMES.has(flat.name)
+        )
+      ) {
+        generationActivityEventIdsRef.current.add(ev.id);
+        onGenerationEnd?.();
+      }
+    }
+
+    if (
+      notificationKey &&
+      !notifiedGenerationEventsRef.current.has(notificationKey)
+    ) {
+      if (flat.type === "error") {
+        notifiedGenerationEventsRef.current.add(notificationKey);
+        onGenerationError?.(flat.message || "Design Agent generation failed");
+      } else if (
+        flat.type === "tool_result" &&
+        GENERATION_TOOL_NAMES.has(flat.name)
+      ) {
+        notifiedGenerationEventsRef.current.add(notificationKey);
+        if (flat.result?.ok === false) {
+          onGenerationError?.(
+            flat.result?.error || "Design Agent generation failed",
+          );
+        } else {
+          onGenerationComplete?.({
+            url: flat.asset?.url || flat.result?.url || null,
+            type: flat.asset?.kind || "design",
+          });
+        }
+      }
+    }
+
+    if (flat.type === "tool_call" && GENERATION_TOOL_NAMES.has(flat.name)) {
       // For edit-style tools, spawn the loader at the same spot the result
       // will land at — beside the source asset (32px to its right). The
       // source stays visible throughout. Keeps the loader and the final
