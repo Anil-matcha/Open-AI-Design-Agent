@@ -1219,7 +1219,7 @@ export default function CreativeCanvas({
             />
 
             {/* Floating Toolbar */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-bg-card border border-divider shadow-2xl px-2 py-1.5 rounded z-20">
+            <div className="absolute bottom-[5vh] left-1/2 -translate-x-1/2 flex items-center gap-1 bg-bg-card border border-divider shadow-2xl px-2 py-1.5 rounded z-20">
               <div className="flex items-center gap-3 px-3">
                 <span className="text-[10px] font-bold text-secondary-text uppercase tracking-widest">{zoomLevel}%</span>
                 <div className="flex items-center gap-1">
@@ -1403,7 +1403,7 @@ export default function CreativeCanvas({
           </div>
 
           {/* Chat Input Area */}
-          <div className="p-2 bg-bg-card">
+          <div className="p-2 pb-[5vh] bg-bg-card">
             <div 
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
